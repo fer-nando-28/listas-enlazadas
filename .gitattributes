@@ -1,2 +1,521 @@
-# Auto detect text files and perform LF normalization
-* text=auto
+class Nodo {
+  dynamic dato;
+  Nodo? siguiente;
+  Nodo? anterior;
+
+  Nodo(this.dato);
+}
+
+class ListaSimple {
+  Nodo? cabeza;
+  int _tamano = 0;
+
+  bool estaVacia() => cabeza == null;
+  int tamano() => _tamano;
+
+  void insertarInicio(dynamic dato) {
+    Nodo nuevo = Nodo(dato);
+    nuevo.siguiente = cabeza;
+    cabeza = nuevo;
+    _tamano++;
+  }
+
+  void insertarFinal(dynamic dato) {
+    Nodo nuevo = Nodo(dato);
+    if (estaVacia()) {
+      cabeza = nuevo;
+    } else {
+      Nodo actual = cabeza!;
+      while (actual.siguiente != null) {
+        actual = actual.siguiente!;
+      }
+      actual.siguiente = nuevo;
+    }
+    _tamano++;
+  }
+
+  void insertarEn(int posicion, dynamic dato) {
+    if (posicion < 0 || posicion > _tamano) {
+      throw RangeError("Posición fuera de los límites de la lista.");
+    }
+    if (posicion == 0) {
+      insertarInicio(dato);
+      return;
+    }
+    if (posicion == _tamano) {
+      insertarFinal(dato);
+      return;
+    }
+
+    Nodo nuevo = Nodo(dato);
+    Nodo actual = cabeza!;
+    for (int i = 0; i < posicion - 1; i++) {
+      actual = actual.siguiente!;
+    }
+    nuevo.siguiente = actual.siguiente;
+    actual.siguiente = nuevo;
+    _tamano++;
+  }
+
+  dynamic eliminarInicio() {
+    if (estaVacia()) {
+      throw Exception("No se puede eliminar de una lista vacía.");
+    }
+    dynamic dato = cabeza!.dato;
+    cabeza = cabeza!.siguiente;
+    _tamano--;
+    return dato;
+  }
+
+  dynamic eliminarFinal() {
+    if (estaVacia()) {
+      throw Exception("No se puede eliminar de una lista vacía.");
+    }
+    if (cabeza!.siguiente == null) {
+      return eliminarInicio();
+    }
+
+    Nodo actual = cabeza!;
+    while (actual.siguiente!.siguiente != null) {
+      actual = actual.siguiente!;
+    }
+    dynamic dato = actual.siguiente!.dato;
+    actual.siguiente = null;
+    _tamano--;
+    return dato;
+  }
+
+  dynamic eliminarEn(int posicion) {
+    if (posicion < 0 || posicion >= _tamano) {
+      throw RangeError("Posición fuera de los límites de la lista.");
+    }
+    if (posicion == 0) {
+      return eliminarInicio();
+    }
+    if (posicion == _tamano - 1) {
+      return eliminarFinal();
+    }
+
+    Nodo actual = cabeza!;
+    for (int i = 0; i < posicion - 1; i++) {
+      actual = actual.siguiente!;
+    }
+    dynamic dato = actual.siguiente!.dato;
+    actual.siguiente = actual.siguiente!.siguiente;
+    _tamano--;
+    return dato;
+  }
+
+  int buscar(dynamic dato) {
+    Nodo? actual = cabeza;
+    int posicion = 0;
+    while (actual != null) {
+      if (actual.dato == dato) {
+        return posicion;
+      }
+      actual = actual.siguiente;
+      posicion++;
+    }
+    return -1;
+  }
+
+  dynamic obtener(int posicion) {
+    if (posicion < 0 || posicion >= _tamano) {
+      throw RangeError("Posición fuera de los límites de la lista.");
+    }
+    Nodo actual = cabeza!;
+    for (int i = 0; i < posicion; i++) {
+      actual = actual.siguiente!;
+    }
+    return actual.dato;
+  }
+
+  void mostrar() {
+    List<String> elementos = [];
+    Nodo? actual = cabeza;
+    while (actual != null) {
+      elementos.add(actual.dato.toString());
+      actual = actual.siguiente;
+    }
+    print("${elementos.join(" -> ")} -> None");
+  }
+}
+
+class ListaDoble {
+  Nodo? cabeza;
+  Nodo? cola;
+  int _tamano = 0;
+
+  bool estaVacia() => cabeza == null;
+  int tamano() => _tamano;
+
+  void insertarInicio(dynamic dato) {
+    Nodo nuevo = Nodo(dato);
+    if (estaVacia()) {
+      cabeza = nuevo;
+      cola = nuevo;
+    } else {
+      nuevo.siguiente = cabeza;
+      cabeza!.anterior = nuevo;
+      cabeza = nuevo;
+    }
+    _tamano++;
+  }
+
+  void insertarFinal(dynamic dato) {
+    Nodo nuevo = Nodo(dato);
+    if (estaVacia()) {
+      cabeza = nuevo;
+      cola = nuevo;
+    } else {
+      nuevo.anterior = cola;
+      cola!.siguiente = nuevo;
+      cola = nuevo;
+    }
+    _tamano++;
+  }
+
+  void insertarEn(int posicion, dynamic dato) {
+    if (posicion < 0 || posicion > _tamano) {
+      throw RangeError("Posición fuera de los límites de la lista.");
+    }
+    if (posicion == 0) {
+      insertarInicio(dato);
+      return;
+    }
+    if (posicion == _tamano) {
+      insertarFinal(dato);
+      return;
+    }
+
+    Nodo nuevo = Nodo(dato);
+    Nodo actual;
+    if (posicion < _tamano ~/ 2) {
+      actual = cabeza!;
+      for (int i = 0; i < posicion; i++) {
+        actual = actual.siguiente!;
+      }
+    } else {
+      actual = cola!;
+      for (int i = 0; i < _tamano - 1 - posicion; i++) {
+        actual = actual.anterior!;
+      }
+    }
+
+    Nodo anterior = actual.anterior!;
+    nuevo.siguiente = actual;
+    nuevo.anterior = anterior;
+    anterior.siguiente = nuevo;
+    actual.anterior = nuevo;
+    _tamano++;
+  }
+
+  dynamic eliminarInicio() {
+    if (estaVacia()) {
+      throw Exception("No se puede eliminar de una lista vacía.");
+    }
+    dynamic dato = cabeza!.dato;
+    if (cabeza == cola) {
+      cabeza = null;
+      cola = null;
+    } else {
+      cabeza = cabeza!.siguiente;
+      cabeza!.anterior = null;
+    }
+    _tamano--;
+    return dato;
+  }
+
+  dynamic eliminarFinal() {
+    if (estaVacia()) {
+      throw Exception("No se puede eliminar de una lista vacía.");
+    }
+    dynamic dato = cola!.dato;
+    if (cabeza == cola) {
+      cabeza = null;
+      cola = null;
+    } else {
+      cola = cola!.anterior;
+      cola!.siguiente = null;
+    }
+    _tamano--;
+    return dato;
+  }
+
+  dynamic eliminarEn(int posicion) {
+    if (posicion < 0 || posicion >= _tamano) {
+      throw RangeError("Posición fuera de los límites de la lista.");
+    }
+    if (posicion == 0) {
+      return eliminarInicio();
+    }
+    if (posicion == _tamano - 1) {
+      return eliminarFinal();
+    }
+
+    Nodo actual = cabeza!;
+    for (int i = 0; i < posicion; i++) {
+      actual = actual.siguiente!;
+    }
+
+    dynamic dato = actual.dato;
+    actual.anterior!.siguiente = actual.siguiente;
+    actual.siguiente!.anterior = actual.anterior;
+    _tamano--;
+    return dato;
+  }
+
+  int buscar(dynamic dato) {
+    Nodo? actual = cabeza;
+    int posicion = 0;
+    while (actual != null) {
+      if (actual.dato == dato) {
+        return posicion;
+      }
+      actual = actual.siguiente;
+      posicion++;
+    }
+    return -1;
+  }
+
+  dynamic obtener(int posicion) {
+    if (posicion < 0 || posicion >= _tamano) {
+      throw RangeError("Posición fuera de los límites de la lista.");
+    }
+    Nodo actual = cabeza!;
+    for (int i = 0; i < posicion; i++) {
+      actual = actual.siguiente!;
+    }
+    return actual.dato;
+  }
+
+  void mostrar() {
+    List<String> elementos = [];
+    Nodo? actual = cabeza;
+    while (actual != null) {
+      elementos.add(actual.dato.toString());
+      actual = actual.siguiente;
+    }
+    print("None <- ${elementos.join(" ⇄ ")} -> None");
+  }
+
+  void mostrarInverso() {
+    List<String> elementos = [];
+    Nodo? actual = cola;
+    while (actual != null) {
+      elementos.add(actual.dato.toString());
+      actual = actual.anterior;
+    }
+    print("None <- ${elementos.join(" ⇄ ")} -> None (Inverso)");
+  }
+}
+
+class ListaCircularSimple {
+  Nodo? cabeza;
+  int _tamano = 0;
+
+  bool estaVacia() => cabeza == null;
+  int tamano() => _tamano;
+
+  void insertarInicio(dynamic dato) {
+    Nodo nuevo = Nodo(dato);
+    if (estaVacia()) {
+      cabeza = nuevo;
+      nuevo.siguiente = cabeza;
+    } else {
+      Nodo actual = cabeza!;
+      while (actual.siguiente != cabeza) {
+        actual = actual.siguiente!;
+      }
+      nuevo.siguiente = cabeza;
+      cabeza = nuevo;
+      actual.siguiente = cabeza;
+    }
+    _tamano++;
+  }
+
+  void insertarFinal(dynamic dato) {
+    if (estaVacia()) {
+      insertarInicio(dato);
+    } else {
+      Nodo nuevo = Nodo(dato);
+      Nodo actual = cabeza!;
+      while (actual.siguiente != cabeza) {
+        actual = actual.siguiente!;
+      }
+      actual.siguiente = nuevo;
+      nuevo.siguiente = cabeza;
+      _tamano++;
+    }
+  }
+
+  void insertarEn(int posicion, dynamic dato) {
+    if (posicion < 0 || posicion > _tamano) {
+      throw RangeError("Posición fuera de los límites de la lista.");
+    }
+    if (posicion == 0) {
+      insertarInicio(dato);
+      return;
+    }
+    if (posicion == _tamano) {
+      insertarFinal(dato);
+      return;
+    }
+
+    Nodo nuevo = Nodo(dato);
+    Nodo actual = cabeza!;
+    for (int i = 0; i < posicion - 1; i++) {
+      actual = actual.siguiente!;
+    }
+    nuevo.siguiente = actual.siguiente;
+    actual.siguiente = nuevo;
+    _tamano++;
+  }
+
+  dynamic eliminarInicio() {
+    if (estaVacia()) {
+      throw Exception("No se puede eliminar de una lista vacía.");
+    }
+    dynamic dato = cabeza!.dato;
+    if (cabeza!.siguiente == cabeza) {
+      cabeza = null;
+    } else {
+      Nodo actual = cabeza!;
+      while (actual.siguiente != cabeza) {
+        actual = actual.siguiente!;
+      }
+      cabeza = cabeza!.siguiente;
+      actual.siguiente = cabeza;
+    }
+    _tamano--;
+    return dato;
+  }
+
+  dynamic eliminarFinal() {
+    if (estaVacia()) {
+      throw Exception("No se puede eliminar de una lista vacía.");
+    }
+    if (cabeza!.siguiente == cabeza) {
+      return eliminarInicio();
+    }
+
+    Nodo actual = cabeza!;
+    while (actual.siguiente!.siguiente != cabeza) {
+      actual = actual.siguiente!;
+    }
+    dynamic dato = actual.siguiente!.dato;
+    actual.siguiente = cabeza;
+    _tamano--;
+    return dato;
+  }
+
+  dynamic eliminarEn(int posicion) {
+    if (posicion < 0 || posicion >= _tamano) {
+      throw RangeError("Posición fuera de los límites de la lista.");
+    }
+    if (posicion == 0) {
+      return eliminarInicio();
+    }
+    if (posicion == _tamano - 1) {
+      return eliminarFinal();
+    }
+
+    Nodo actual = cabeza!;
+    for (int i = 0; i < posicion - 1; i++) {
+      actual = actual.siguiente!;
+    }
+    dynamic dato = actual.siguiente!.dato;
+    actual.siguiente = actual.siguiente!.siguiente;
+    _tamano--;
+    return dato;
+  }
+
+  int buscar(dynamic dato) {
+    if (estaVacia()) return -1;
+    Nodo actual = cabeza!;
+    int posicion = 0;
+    do {
+      if (actual.dato == dato) {
+        return posicion;
+      }
+      actual = actual.siguiente!;
+      posicion++;
+    } while (actual != cabeza);
+    return -1;
+  }
+
+  dynamic obtener(int posicion) {
+    if (posicion < 0 || posicion >= _tamano) {
+      throw RangeError("Posición fuera de los límites de la lista.");
+    }
+    Nodo actual = cabeza!;
+    for (int i = 0; i < posicion; i++) {
+      actual = actual.siguiente!;
+    }
+    return actual.dato;
+  }
+
+  void mostrar() {
+    if (estaVacia()) {
+      print("Lista vacía (Ciclo)");
+      return;
+    }
+    List<String> elementos = [];
+    Nodo actual = cabeza!;
+    do {
+      elementos.add(actual.dato.toString());
+      actual = actual.siguiente!;
+    } while (actual != cabeza);
+    print("${elementos.join(" -> ")} -> (Regresa a ${cabeza!.dato})");
+  }
+}
+
+void main() {
+  print("=== PRUEBA 1: LISTA SIMPLEMENTE ENLAZADA ===");
+  var ls = ListaSimple();
+  print("¿Está vacía? ${ls.estaVacia()}");
+  ls.insertarFinal("B");
+  ls.insertarFinal("D");
+  ls.insertarInicio("A");
+  ls.insertarEn(2, "C");
+  ls.insertarFinal("E");
+  print("Tamaño: ${ls.tamano()}");
+  print("Contenido después de inserciones:");
+  ls.mostrar();
+
+  print("\n=== PRUEBA 2: BÚSQUEDA Y RECUPERACIÓN ===");
+  print("Buscar 'C': Posición ${ls.buscar("C")}");
+  print("Buscar 'Z' (no existe): Posición ${ls.buscar("Z")}");
+  print("Obtener elemento en posición 3: ${ls.obtener(3)}");
+
+  print("\n=== PRUEBA 3: ELIMINACIÓN Y ACTUALIZACIÓN ===");
+  print("Eliminando inicio: ${ls.eliminarInicio()}");
+  ls.mostrar();
+  print("Eliminando final: ${ls.eliminarFinal()}");
+  ls.mostrar();
+  print("Eliminando en posición 1: ${ls.eliminarEn(1)}");
+  ls.mostrar();
+
+  print("\n=== PRUEBA 4: LISTA DOBLEMENTE ENLAZADA ===");
+  var ld = ListaDoble();
+  ld.insertarFinal(10);
+  ld.insertarFinal(30);
+  ld.insertarInicio(5);
+  ld.insertarEn(2, 20);
+  print("Recorrido hacia adelante:");
+  ld.mostrar();
+  print("Recorrido hacia atrás:");
+  ld.mostrarInverso();
+
+  print("\n=== PRUEBA 5: LISTA CIRCULAR SIMPLEMENTE ENLAZADA ===");
+  var lc = ListaCircularSimple();
+  lc.insertarFinal("Nodo1");
+  lc.insertarFinal("Nodo2");
+  lc.insertarFinal("Nodo3");
+  lc.insertarInicio("Nodo0");
+  print("Contenido con una vuelta completa:");
+  lc.mostrar();
+  print("Eliminando el primer nodo:");
+  lc.eliminarInicio();
+  lc.mostrar();
+}
